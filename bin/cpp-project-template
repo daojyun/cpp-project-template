@@ -221,8 +221,15 @@ LogError() {
   exit 1
 }
 
+flag_print_debug_message= # default OFF
 Debug() {
-  Log "[Debug] $1"
+  [[ $flag_print_debug_message != ON ]] || Log "[Debug] $1"
+}
+TurnOnDebug() {
+  flag_print_debug_message=ON
+}
+TurnOffDebug() {
+  flag_print_debug_message=
 }
 
 DebugVariable() {
@@ -287,6 +294,7 @@ function on_exit() {
 if [[ $# -eq 0 || ($# -eq 1 && ! "$1" =~ ^--) ]]; then
   Log '>>> cpp-project-template'
   trap on_exit EXIT
+  TurnOffDebug
   Setup "$@"
   result='project template installation completed'
 else
