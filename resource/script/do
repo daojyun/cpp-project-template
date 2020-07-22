@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+
+#  enable unofficial bash strict mode
+set -o errexit -o nounset -o pipefail
+# IFS: A list of characters that separate fields; used when the shell splits words as part of expansion.
+IFS=$'\n\t'
+
+# command
+Build() {
+  ResolveBinaryDirectory "$@"
+
+  ninja_flag=
+  # ninja_flag='-GNinja'
+  cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=1 "$ninja_flag" -S "$source_directory" -B "$binary_directory"
+  cmake --build "$binary_directory"
+
+  cpack_config="$binary_directory/CPackConfig.cmake"
+  [[ -f $cpack_config ]] && cpack --verbose -C Release --config "$cpack_config" || return 0
+}
+
+Run() {
+  ResolveBinaryDirectory "$@"
+  Run # please assign a executable
+}
+
+RunUnitTest() {
+  ResolveBinaryDirectory "$@"
+  Run 'test/UnitTest'
+}
+
+Tdd() {
+  ResolveBinaryDirectory "$@"
+  cmake --build "$binary_directory"
+  Run 'test/UnitTest'
+}
+
+CleanAll() {
+  # remove all files in binary directory except extern/
+  ResolveBinaryDirectory "$@"
+  for item in "$binary_directory"/*; do
+    if [[ $(basename "$item") != 'extern' ]]; then
+      echo "removed $item"
+      rm -rf "$item"
+    fi
+  done
+}
+
+# tool
+ResolveBinaryDirectory() {
+  folder=${1:-build}
+  [[ "$folder" =~ ^build ]] || {
+    echo "invalid binary directory name"
+    exit 1
+  }
+
+  binary_directory="$repository_root/$folder"
+  [[ -d $binary_directory ]] || mkdir -v "$binary_directory"
+}
+
+Run() {
+  exe="$binary_directory/$1"
+  output_cache="$binary_directory/output_cache.log"
+  if [[ -x $exe ]]; then
+    shift
+    $exe "$@" 2>&1 | tee "$output_cache"
+  else
+    echo "it is not executable: $exe"
+  fi
+}
+
+# main
+repository_root=$(git rev-parse --show-toplevel)
+binary_directory=
+source_directory="$repository_root"
+
+if [[ $# -eq 0 ]]; then
+  cat <<EOF
+Usage: $0 <command> [<args>]
+
+Command
+  Build        [<binary folder>]
+  Run          [<binary folder>]
+  RunUnitTest  [<binary folder>]
+  Tdd          [<binary folder>]  (to build and run the unit tests)
+  CleanAll     [<binary folder>]
+
+Default setting
+  <binary folder>    build/
+EOF
+else
+  "$@"
+fi
