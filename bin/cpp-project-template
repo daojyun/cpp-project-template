@@ -183,9 +183,9 @@ RunUnitTest() {
 
 CommitChangedFiles() {
   Message 'git commit ...'
-  default_message=$'Setup the development infrastructure for C++ project\n\n#'
+  default_message='Setup the development infrastructure for C++ project'
   hint=$'\n\n# (Submit an empty message to abort the commit.)'
-  DebugCommand git commit --edit --status --verbose "--message='$default_message$hint'" "||" return 0
+  DebugCommand git commit --edit --status --verbose "--message=$default_message$hint" "||" return 0
 }
 
 InstallDirectory() {
@@ -298,7 +298,7 @@ EOF
 
 result='ERROR occurred! installation stopped'
 function on_exit() {
-  printf "\n  %sn" "$result"
+  printf "\n> %sn" "$result"
 }
 
 if [[ $# -eq 0 || ($# -eq 1 && ! "$1" =~ ^--) ]]; then
