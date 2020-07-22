@@ -13,8 +13,7 @@ Setup() {
   resource_directory=$(PrintResourceDirectory "$script_directory")
   DebugVariable resource_directory
 
-  # UpdateSelfRepository "$resource_directory"
-  #@@@@@@
+  UpdateSelfRepository "$resource_directory"
 
   CheckRequiredTools
   SetupGitRepository
