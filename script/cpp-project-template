@@ -267,8 +267,13 @@ Log() {
 
 PrintHelp() {
   cat <<EOF
-Usage: $0 [ProjectName]
-(if ProjectName is not specified, default value is name of project root directory.)
+To setup c++ project in one command.
+
+Usage: $(basename "$0") [<ProjectName>]
+
+if ProjectName is not specified, default value is "name of project root directory".
+
+https://github.com/daojyun/cpp-project-template
 EOF
 }
 
@@ -277,8 +282,8 @@ function on_exit() {
   printf "\n>>> %s\n" "$result"
 }
 
-Log '>>> cpp-project-template'
 if [[ $# -eq 0 || ($# -eq 1 && ! "$1" =~ ^--) ]]; then
+  Log '>>> cpp-project-template'
   trap on_exit EXIT
   Setup "$@"
   result='project template installation completed'
