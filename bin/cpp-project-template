@@ -99,7 +99,7 @@ PrintProjectName() {
 ValidateProjectName() {
   project_name="$1"
   Debug 'validate project name ...'
-  if [[ -z ${project_name} || ${project_name:0:1} == '.' || $project_name =~ [^0-9A-Za-z._-\ ] ]]; then
+  if [[ -z "$project_name" || ${project_name:0:1} == '.' || $project_name =~ [^0-9A-Za-z._-\ ] ]]; then
     LogError "invalid project name: $(ToString "$project_name")"
   fi
 }
@@ -221,7 +221,7 @@ LogError() {
   exit 1
 }
 
-flag_print_debug_message= # default OFF
+flag_print_debug_message=
 Debug() {
   [[ $flag_print_debug_message != ON ]] || Log "[Debug] $1"
 }
@@ -229,8 +229,9 @@ TurnOnDebug() {
   flag_print_debug_message=ON
 }
 TurnOffDebug() {
-  flag_print_debug_message=
+  flag_print_debug_message=OFF
 }
+TurnOffDebug # default Debug OFF
 
 DebugVariable() {
   Debug "$1=$(ToString "${!1}")"
