@@ -293,5 +293,5 @@ ApplyCppProjectTemplate() {
   fi
 }
 
-TurnOnDebug
+TurnOffDebug
 ApplyCppProjectTemplate "$0" "$@"
